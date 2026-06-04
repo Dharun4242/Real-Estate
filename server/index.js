@@ -145,8 +145,10 @@ app.get('/api/health', (_req, res) =>
   res.json({ ok: true, mode: MODE, configured: !!(CLIENT_ID && CLIENT_SECRET) }),
 )
 
-// ---- Serve the built frontend (production convenience) ------------------
-const distDir = path.resolve(__dirname, '..', 'dist')
+// ---- Serve the built frontend (local full-stack convenience) ------------
+// In production the frontend is deployed separately (Vercel) and the API
+// runs standalone. This only serves the build if you run everything locally.
+const distDir = path.resolve(__dirname, '..', 'client', 'dist')
 app.use(express.static(distDir))
 app.get('*', (_req, res) => {
   res.sendFile(path.join(distDir, 'index.html'), (err) => {
