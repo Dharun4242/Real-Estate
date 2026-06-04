@@ -5,6 +5,12 @@ import { load } from '@cashfreepayments/cashfree-js'
 // in your frontend .env when going live.
 const MODE = import.meta.env.VITE_CASHFREE_MODE || 'sandbox'
 
+// Base URL of the payment backend. When blank, calls stay relative and go
+// through the Vite dev proxy (local dev). In production, point this at the
+// deployed API, e.g. https://real-estate-gj09.onrender.com
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+const api = (path) => `${API_BASE}${path}`
+
 let cashfreePromise = null
 
 function getCashfree() {
@@ -25,7 +31,7 @@ function getCashfree() {
  * @returns {Promise<{orderId: string}>}
  */
 export async function startBooking({ plot, customer }) {
-  const res = await fetch('/api/create-order', {
+  const res = await fetch(api('/api/create-order'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -57,7 +63,7 @@ export async function startBooking({ plot, customer }) {
  * @returns {Promise<{status: string, orderAmount: number}>}
  */
 export async function verifyBooking(orderId) {
-  const res = await fetch(`/api/order-status/${encodeURIComponent(orderId)}`)
+  const res = await fetch(api(`/api/order-status/${encodeURIComponent(orderId)}`))
   if (!res.ok) throw new Error('Could not verify the payment status.')
   return res.json()
 }
